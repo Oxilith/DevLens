@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>    
+        <Authors>Konrad Jagusiak</Authors>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <Description>DevLens - A tool for analyzing project health, complexity, dependencies, and identifying areas for improvement.</Description>
+        <RepositoryUrl>https://github.com/Oxilith/DevLens?tab=readme-ov-file</RepositoryUrl>
+        <Version>1.0.0</Version>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Domain\Domain.csproj"/>
+        <ProjectReference Include="..\Infrastructure\Infrastructure.csproj"/>
+    </ItemGroup>
+
+</Project>

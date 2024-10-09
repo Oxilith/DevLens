@@ -1,0 +1,82 @@
+﻿@using System.Collections.ObjectModel
+@using Application
+@using Domain.Entities
+@using Domain.Enums
+@using Domain.Models
+@using Domain
+@inject IJSRuntime JS
+@rendermode InteractiveServer
+
+@if (!Changes.Any())
+{
+    <p>Loading changes...</p>
+}
+else
+{
+    <div class="row">
+        @foreach (var item in Data)
+        {
+            <div class="col-md-6 mb-4">
+                <div class="chart-container" style="position: relative; height:200px!important; width: 600px!important;">
+                    <h6>@item.FileName</h6>
+                    <canvas id="chart_@item.FileName.Replace(".", "_")"></canvas>
+                </div>
+                <br/><hr/><br/>
+            </div>
+        }
+    </div>
+}
+
+@code {
+    private readonly Random _random = new(DateTimeOffset.UtcNow.Millisecond);
+
+    public ReadOnlyCollection<ChangeDataModel> Data { get; set; } = new List<ChangeDataModel>().AsReadOnly();
+
+    [CascadingParameter(Name = "Changes")] public List<ProjectChange> Changes { get; set; } = new();
+    [Parameter] public required FileType FileType { get; set; }
+    [Parameter] public int Limit { get; set; } = 0;
+
+    protected override Task OnInitializedAsync()
+    {
+        var processor = new ChangeDataProcessor(Changes, FileType);
+        Data = processor.GetData(Limit);
+
+        return Task.CompletedTask;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await RenderProjectChart();
+        }
+    }
+
+    private async Task RenderProjectChart()
+    {
+        foreach (var item in Data)
+        {
+            var filename = item.FileName;
+            var months = item.MonthlyChanges.Select(x => x.Month.ToString()).ToArray();
+            var counts = item.MonthlyChanges.Select(x => x.ChangeCount).ToArray();
+
+            var chartData = new
+            {
+                labels = months,
+                datasets = new[]
+                {
+                    new
+                    {
+                        label = $"Changes in {filename}",
+                        data = counts,
+                        borderColor = $"rgba({_random.Next(1, 255)}, {_random.Next(1, 255)}, {_random.Next(1, 255)}, {_random.Next(1, 255)})",
+                        borderWidth = 1
+                    }
+                }
+            };
+
+            await JS.InvokeVoidAsync("renderChart", $"chart_{filename.Replace(".", "_")}", chartData);
+        }
+    }
+
+}

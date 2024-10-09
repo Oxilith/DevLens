@@ -1,0 +1,40 @@
+﻿# Solution: DevLens
+# Author: Konrad Jagusiak
+# License: MIT
+# Description: A tool for analyzing project health, complexity, dependencies, and identifying areas for improvement
+# Version: 1.0.0
+
+Microsoft Visual Studio Solution File, Format Version 12.00
+
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DevLens", "DevLens\DevLens.csproj", "{68F27F4F-2AEF-4562-AA1F-5F7662AC6C7F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Domain", "Domain\Domain.csproj", "{CBAAF91A-55E7-433D-BE2A-15E200CBCA91}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Application", "Application\Application.csproj", "{C11DFA57-4E29-4029-A49C-7A66499D0B0C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infrastructure", "Infrastructure\Infrastructure.csproj", "{CD7CFAEA-C45C-49EF-9F74-757A07180C70}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{68F27F4F-2AEF-4562-AA1F-5F7662AC6C7F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{68F27F4F-2AEF-4562-AA1F-5F7662AC6C7F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{68F27F4F-2AEF-4562-AA1F-5F7662AC6C7F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{68F27F4F-2AEF-4562-AA1F-5F7662AC6C7F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CBAAF91A-55E7-433D-BE2A-15E200CBCA91}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CBAAF91A-55E7-433D-BE2A-15E200CBCA91}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CBAAF91A-55E7-433D-BE2A-15E200CBCA91}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CBAAF91A-55E7-433D-BE2A-15E200CBCA91}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C11DFA57-4E29-4029-A49C-7A66499D0B0C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C11DFA57-4E29-4029-A49C-7A66499D0B0C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C11DFA57-4E29-4029-A49C-7A66499D0B0C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C11DFA57-4E29-4029-A49C-7A66499D0B0C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CD7CFAEA-C45C-49EF-9F74-757A07180C70}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CD7CFAEA-C45C-49EF-9F74-757A07180C70}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CD7CFAEA-C45C-49EF-9F74-757A07180C70}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CD7CFAEA-C45C-49EF-9F74-757A07180C70}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
