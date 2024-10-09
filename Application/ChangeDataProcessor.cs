@@ -1,5 +1,4 @@
 ﻿using System.Collections.ObjectModel;
-using Domain;
 using Domain.Entities;
 using Domain.Enums;
 using Domain.Extensions;
@@ -10,17 +9,20 @@ namespace Application;
 
 public class ChangeDataProcessor
 {
-    private readonly List<ChangeDataModel> _changes;
+    private const int NumberOfMonthsForAverageCalculation = 6;
+    private const int MinimumMonthlyChanges = 5;
+    private readonly IReadOnlyCollection<ChangeDataModel> _changes;
 
     public ChangeDataProcessor(IEnumerable<ProjectChange> changes, FileType fileType)
     {
-        var fileExtension = fileType.ToFileExtension();
+        ArgumentNullException.ThrowIfNull(changes, nameof(changes));
+        ArgumentNullException.ThrowIfNull(fileType, nameof(fileType));
 
         var classes = changes.SelectMany(c => c.ClassChanges)
-            .Where(x => x.ClassName.EndsWith(fileExtension))
+            .Where(x => x.ClassName.EndsWith(fileType.ToFileExtension(), StringComparison.OrdinalIgnoreCase))
             .GroupBy(x => x.ClassName);
 
-        _changes = classes.Select(CreateChangeDataModel).ToList();
+        _changes = new ReadOnlyCollection<ChangeDataModel>(classes.Select(CreateChangeDataModel).ToList());
     }
 
     private ChangeDataModel CreateChangeDataModel(IGrouping<string, ClassChange> group)
@@ -31,15 +33,14 @@ public class ChangeDataProcessor
             .OrderBy(x => x.Month)
             .ToList();
 
-        var completeMonthlyChanges = FillMissingMonths(orderedMonthlyChanges).OrderBy(x => x.Month);
+        var completeMonthlyChanges = FillMissingMonths(orderedMonthlyChanges);
+        var changeDataModel = new ChangeDataModel(group.Key);
+        changeDataModel.SetMonthlyChanges(completeMonthlyChanges);
 
-        return new ChangeDataModel(group.Key)
-        {
-            MonthlyChanges = completeMonthlyChanges
-        };
+        return changeDataModel;
     }
 
-    private List<MonthlyChange> FillMissingMonths(List<MonthlyChange> orderedMonthlyChanges)
+    private IReadOnlyCollection<MonthlyChange> FillMissingMonths(List<MonthlyChange> orderedMonthlyChanges)
     {
         var completeMonthlyChanges = new List<MonthlyChange>();
         if (orderedMonthlyChanges.Count == 0) return completeMonthlyChanges;
@@ -57,39 +58,41 @@ public class ChangeDataProcessor
         return completeMonthlyChanges;
     }
 
-    private List<ChangeDataModel> LimitAndOrderData(int limit)
+    private IReadOnlyCollection<ChangeDataModel> LimitAndOrderData(int limit)
     {
-        return ApplyLimit(GetOrderedByAverageChangesFromLastSixMonths(), limit);
+        return ApplyLimit(GetOrderedByAverageChangesFromLastMonths(), limit);
     }
 
-    private IEnumerable<ChangeDataModel> GetOrderedByAverageChangesFromLastSixMonths()
+    private IReadOnlyCollection<ChangeDataModel> GetOrderedByAverageChangesFromLastMonths()
     {
-        return _changes.Where(change => change.MonthlyChanges.Count() > 5)
-            .OrderBy(GetAverageChangesFromLastSixMonths);
+        return new ReadOnlyCollection<ChangeDataModel>(_changes
+            .Where(change => change.MonthlyChanges.Count() > MinimumMonthlyChanges)
+            .OrderByDescending(GetAverageChangesFromLastMonths).ToList());
     }
 
-    private double GetAverageChangesFromLastSixMonths(ChangeDataModel change)
+    private double GetAverageChangesFromLastMonths(ChangeDataModel change)
     {
+        if (!change.MonthlyChanges.Any()) return 0;
+
         return change.MonthlyChanges.OrderByDescending(m => m.Month)
-            .Take(6)
+            .Take(NumberOfMonthsForAverageCalculation)
             .Average(m => m.ChangeCount);
     }
 
-    private List<ChangeDataModel> ApplyLimit(IEnumerable<ChangeDataModel> orderedChanges, int limit)
+    private IReadOnlyCollection<ChangeDataModel> ApplyLimit(IReadOnlyCollection<ChangeDataModel> orderedChanges, int limit)
     {
-        return orderedChanges
-            .Reverse()
-            .Take(limit == 0 ? _changes.Count : limit)
-            .ToList();
+        if (limit == 0 || limit >= orderedChanges.Count) return orderedChanges.ToList();
+
+        return orderedChanges.Take(limit).ToList();
     }
 
-    public ReadOnlyCollection<ChangeDataModel> GetData()
+    public IReadOnlyCollection<ChangeDataModel> GetData()
     {
-        return GetOrderedByAverageChangesFromLastSixMonths().Reverse().ToList().AsReadOnly();
+        return GetOrderedByAverageChangesFromLastMonths();
     }
 
-    public ReadOnlyCollection<ChangeDataModel> GetData(int limit)
+    public IReadOnlyCollection<ChangeDataModel> GetData(int limit)
     {
-        return LimitAndOrderData(limit).ToList().AsReadOnly();
+        return LimitAndOrderData(limit);
     }
 }

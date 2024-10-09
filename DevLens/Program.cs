@@ -1,6 +1,8 @@
 using Application;
+using Application.Interfaces;
 using DevLens.Components;
 using Infrastructure;
+using Infrastructure.Interfaces;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -8,6 +10,8 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
+
+builder.Services.AddMemoryCache();
 
 builder.Services.AddScoped<ICommitRepository, CommitRepository>();
 builder.Services.AddScoped<IChangeTrackingService, ChangeTrackingService>();

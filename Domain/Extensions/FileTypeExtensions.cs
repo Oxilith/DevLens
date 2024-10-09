@@ -8,10 +8,10 @@ public static class FileTypeExtensions
     {
         return fileType switch
         {
-            FileType.JSON => ".json",
+            FileType.Json => ".json",
             FileType.Class => ".cs",
-            FileType.TS => ".ts",
-            FileType.TSX => ".tsx",
+            FileType.Ts => ".ts",
+            FileType.Tsx => ".tsx",
             _ => throw new ArgumentOutOfRangeException(nameof(fileType), fileType, null)
         };
     }

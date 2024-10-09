@@ -2,8 +2,8 @@
 
 public enum FileType
 {
-    JSON,
+    Json,
     Class,
-    TS,
-    TSX
+    Ts,
+    Tsx
 }

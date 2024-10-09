@@ -1,15 +1,17 @@
-﻿@using System.Collections.ObjectModel
-@using Application
+﻿@using Application
 @using Domain.Entities
-@using Domain.Enums
 @using Domain.Models
-@using Domain
 @inject IJSRuntime JS
+
 @rendermode InteractiveServer
 
-@if (!Changes.Any())
+@if (Data is null) 
 {
     <p>Loading changes...</p>
+}
+else if (!Data.Any())
+{
+    <p>Nothing to show.</p> 
 }
 else
 {
@@ -30,16 +32,19 @@ else
 @code {
     private readonly Random _random = new(DateTimeOffset.UtcNow.Millisecond);
 
-    public ReadOnlyCollection<ChangeDataModel> Data { get; set; } = new List<ChangeDataModel>().AsReadOnly();
+    public IReadOnlyCollection<ChangeDataModel>? Data { get; set; }
 
-    [CascadingParameter(Name = "Changes")] public List<ProjectChange> Changes { get; set; } = new();
+    [CascadingParameter(Name = "Changes")] public IReadOnlyCollection<ProjectChange>? Changes { get; set; }
     [Parameter] public required FileType FileType { get; set; }
     [Parameter] public int Limit { get; set; } = 0;
 
     protected override Task OnInitializedAsync()
     {
-        var processor = new ChangeDataProcessor(Changes, FileType);
-        Data = processor.GetData(Limit);
+        if (Changes != null)
+        {
+            var processor = new ChangeDataProcessor(Changes, FileType);
+            Data = processor.GetData(Limit);
+        }
 
         return Task.CompletedTask;
     }
@@ -54,29 +59,30 @@ else
 
     private async Task RenderProjectChart()
     {
-        foreach (var item in Data)
-        {
-            var filename = item.FileName;
-            var months = item.MonthlyChanges.Select(x => x.Month.ToString()).ToArray();
-            var counts = item.MonthlyChanges.Select(x => x.ChangeCount).ToArray();
-
-            var chartData = new
+        if (Data != null)
+            foreach (var item in Data)
             {
-                labels = months,
-                datasets = new[]
-                {
-                    new
-                    {
-                        label = $"Changes in {filename}",
-                        data = counts,
-                        borderColor = $"rgba({_random.Next(1, 255)}, {_random.Next(1, 255)}, {_random.Next(1, 255)}, {_random.Next(1, 255)})",
-                        borderWidth = 1
-                    }
-                }
-            };
+                var filename = item.FileName;
+                var months = item.MonthlyChanges.Select(x => x.Month.ToString()).ToArray();
+                var counts = item.MonthlyChanges.Select(x => x.ChangeCount).ToArray();
 
-            await JS.InvokeVoidAsync("renderChart", $"chart_{filename.Replace(".", "_")}", chartData);
-        }
+                var chartData = new
+                {
+                    labels = months,
+                    datasets = new[]
+                    {
+                        new
+                        {
+                            label = $"Changes in {filename}",
+                            data = counts,
+                            borderColor = $"rgba({_random.Next(1, 255)}, {_random.Next(1, 255)}, {_random.Next(1, 255)}, {_random.Next(1, 255)})",
+                            borderWidth = 1
+                        }
+                    }
+                };
+
+                await JS.InvokeVoidAsync("renderChart", $"chart_{filename.Replace(".", "_")}", chartData);
+            }
     }
 
 }
