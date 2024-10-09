@@ -1,33 +1,33 @@
 # DevLens
 
-DevLens is a powerful, developer-centric tool designed to analyze project health and provide insightful metrics on code quality, dependencies, coupling, and complexity. Its goal is to help developers gain visibility into areas of the codebase that need attention, making it easier to identify problematic parts of a project and take proactive steps to improve quality and maintainability.
+DevLens is (going to be :D) a powerful, developer-centric tool designed to analyze project health and provide insightful metrics on code quality, dependencies, coupling, and complexity. Its goal is to help developers gain visibility into areas of the codebase that need attention, making it easier to identify problematic parts of a project and take proactive steps to improve quality and maintainability.
 
 ## Key Features
 
-### Git Commit Analysis
+### Git Commit Analysis - In progress
 
 Devens provides insights based on Git commits to help track changes over time, enabling developers to understand the evolution of the codebase. Key features include:
 
 - **Commit Frequency**: Identify active areas of the project and understand the historical activity.
 - **Class Changes**: Track which classes are frequently modified, allowing for early detection of areas prone to bugs.
 
-### Dependency Analysis
+### Dependency Analysis - TODO
 
 DevLens identifies dependencies within your project to reveal:
 
 - **Tight Coupling**: Discover areas where classes or modules are tightly coupled, making future changes risky.
 - **External Dependencies**: Monitor and track third-party dependencies that could introduce issues such as security vulnerabilities or maintenance concerns.
 
-### Coupling and Complexity Assessment
+### Coupling and Complexity Assessment- TODO
 
 - **Code Complexity**: Analyze the complexity of your code to identify areas that might need refactoring. Cyclomatic complexity metrics highlight the most complex methods or classes.
 - **Coupling Metrics**: Show dependencies and coupling between components, allowing developers to focus on decoupling for a more maintainable architecture.
 
-### Hotspot Detection
+### Hotspot Detection - TODO
 
 DevLens highlights "hotspots"—areas that have high complexity and frequent changes. This helps teams focus on stabilizing critical parts of the code and ensuring these areas receive extra attention during reviews.
 
-### Developer Insights Dashboard
+### Developer Insights Dashboard - TODO
 
 DevLens provides an interactive dashboard that consolidates all these insights into one place:
 
