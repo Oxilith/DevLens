@@ -1,5 +1,7 @@
-﻿using Domain;
+﻿using System.Collections.ObjectModel;
+using Domain;
 using Domain.Entities;
+using Infrastructure.Interfaces;
 using LibGit2Sharp;
 using Commit = Domain.Entities.Commit;
 
@@ -7,7 +9,7 @@ namespace Infrastructure;
 
 public class CommitRepository : ICommitRepository
 {
-    public IEnumerable<Commit> GetCommits(string repositoryPath, int numberOfCommits)
+    public IReadOnlyCollection<Commit> GetCommits(string repositoryPath, int numberOfCommits)
     {
         using var repo = new Repository(repositoryPath);
         var commits = new List<Commit>();
@@ -33,6 +35,6 @@ public class CommitRepository : ICommitRepository
             ));
         }
 
-        return commits;
+        return new ReadOnlyCollection<Commit>(commits);
     }
 }

@@ -1,15 +1,8 @@
 ﻿namespace Domain.Entities;
 
-public class ProjectChange
+public class ProjectChange(DateTime changeDate, string commitMessage, List<ClassChange> classChanges)
 {
-    public ProjectChange(DateTime changeDate, string commitMessage, List<ClassChange> classChanges)
-    {
-        ChangeDate = changeDate;
-        CommitMessage = commitMessage;
-        ClassChanges = classChanges;
-    }
-
-    public DateTime ChangeDate { get; private set; }
-    public string CommitMessage { get; private set; }
-    public List<ClassChange> ClassChanges { get; private set; }
+    public DateTime ChangeDate { get; private set; } = changeDate;
+    public string CommitMessage { get; private set; } = commitMessage;
+    public List<ClassChange> ClassChanges { get; private set; } = classChanges;
 }

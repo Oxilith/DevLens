@@ -2,8 +2,8 @@
 
 public readonly struct YearMonth : IComparable<YearMonth>
 {
-    public int Year { get; }
-    public int Month { get; }
+    public int Year { get; init; }
+    public int Month { get; init; }
 
     private YearMonth(int year, int month)
     {

@@ -9,6 +9,9 @@
         <Description>DevLens - A tool for analyzing project health, complexity, dependencies, and identifying areas for improvement.</Description>
         <RepositoryUrl>https://github.com/Oxilith/DevLens?tab=readme-ov-file</RepositoryUrl>
         <Version>1.0.0</Version>
+
+        <OutputPath>root/</OutputPath>
+        <BaseHref>/DevLens/</BaseHref>
     </PropertyGroup>
 
     <ItemGroup>

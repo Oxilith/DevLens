@@ -1,17 +1,9 @@
 ﻿namespace Domain.Entities;
 
-public class ClassChange
+public class ClassChange(string className, string changeType, string diff, DateTimeOffset changeDate)
 {
-    public ClassChange(string className, string changeType, string diff, DateTimeOffset changeDate)
-    {
-        ClassName = className;
-        ChangeType = changeType;
-        Diff = diff;
-        ChangeDate = changeDate;
-    }
-
-    public string ClassName { get; private set; }
-    public DateTimeOffset ChangeDate { get; private set; }
-    public string ChangeType { get; private set; }
-    public string Diff { get; private set; }
+    public string ClassName { get; private set; } = className;
+    public DateTimeOffset ChangeDate { get; private set; } = changeDate;
+    public string ChangeType { get; private set; } = changeType;
+    public string Diff { get; private set; } = diff;
 }

@@ -1,6 +1,8 @@
 using Application;
+using Application.Interfaces;
 using DevLens.Components;
 using Infrastructure;
+using Infrastructure.Interfaces;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -9,8 +11,13 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
+builder.Services.AddMemoryCache();
+
 builder.Services.AddScoped<ICommitRepository, CommitRepository>();
 builder.Services.AddScoped<IChangeTrackingService, ChangeTrackingService>();
+
+builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.Configuration.GetValue<string>("EnvBaseAddress") ?? throw new InvalidOperationException("Env base address is not set")) });
+
 
 var repositoryPath = builder.Configuration.GetValue<string>("RepositorySettings:Path");
 builder.Services.AddCascadingValue("Changes",

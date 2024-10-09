@@ -1,24 +1,31 @@
-﻿using Domain;
+﻿using System.Collections.ObjectModel;
+using Application.Interfaces;
 using Domain.Entities;
-using Infrastructure;
+using Infrastructure.Interfaces;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace Application;
 
-public class ChangeTrackingService : IChangeTrackingService
+public class ChangeTrackingService(ICommitRepository commitRepository, IMemoryCache memoryCache) : IChangeTrackingService
 {
-    private readonly ICommitRepository _commitRepository;
+    private readonly IMemoryCache _memoryCache = memoryCache;
+    private const int NumberOfCommitsToFetch = 100 * 100 * 100 * 100;
 
-    public ChangeTrackingService(ICommitRepository commitRepository)
+    public IReadOnlyCollection<ProjectChange> GetChanges(string repositoryPath)
     {
-        _commitRepository = commitRepository;
-    }
+        if (_memoryCache.TryGetValue(repositoryPath, out IReadOnlyCollection<ProjectChange> cachedChanges))
+        {
+            return cachedChanges ?? new List<ProjectChange>().AsReadOnly();
+        }
 
-    public List<ProjectChange> GetChanges(string repositoryPath)
-    {
-        var commits = _commitRepository.GetCommits(repositoryPath, 100000); // Example: last 100000 commits
+        var commits = commitRepository.GetCommits(repositoryPath, NumberOfCommitsToFetch);
 
-        return commits
+        IReadOnlyCollection<ProjectChange> projectChanges = new ReadOnlyCollection<ProjectChange>(commits
             .Select(commit => new ProjectChange(commit.CommitDate, commit.Message, commit.ClassChanges.ToList()))
-            .ToList();
+            .ToList());
+        
+        _memoryCache.Set(repositoryPath, projectChanges, new MemoryCacheEntryOptions { Priority = CacheItemPriority.NeverRemove });
+        
+        return projectChanges;
     }
 }
