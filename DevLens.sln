@@ -1,10 +1,4 @@
-﻿# Solution: DevLens
-# Author: Konrad Jagusiak
-# License: MIT
-# Description: A tool for analyzing project health, complexity, dependencies, and identifying areas for improvement
-# Version: 1.0.0
-
-Microsoft Visual Studio Solution File, Format Version 12.00
+﻿Microsoft Visual Studio Solution File, Format Version 12.00
 
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DevLens", "DevLens\DevLens.csproj", "{68F27F4F-2AEF-4562-AA1F-5F7662AC6C7F}"
 EndProject
