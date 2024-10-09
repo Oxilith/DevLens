@@ -6,6 +6,7 @@ using DevLens.Components;
 using Infrastructure;
 using Infrastructure.Interfaces;
 using Microsoft.ApplicationInsights.AspNetCore;
+using Microsoft.ApplicationInsights.Extensibility;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -21,10 +22,10 @@ builder.Services.AddMemoryCache();
 builder.Services.AddOpenTelemetry().UseAzureMonitor(options =>
     options.ConnectionString = builder.Configuration["ApplicationInsights:ConnectionString"]);
 builder.Services.AddApplicationInsightsTelemetry(options => options.ConnectionString = builder.Configuration["ApplicationInsights:ConnectionString"]);
-builder.Services.AddSingleton<ITelemetryProcessorFactory>(sp => new DependencyFilterProcessorFactory());
 
 #endif
 
+builder.Services.AddSingleton<ITelemetryProcessorFactory>(_ => new DependencyFilterProcessorFactory());
 builder.Services.AddScoped<ICommitRepository, CommitRepository>();
 builder.Services.AddScoped<IChangeTrackingService, ChangeTrackingService>();
 

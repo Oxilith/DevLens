@@ -13,14 +13,14 @@ public class ChangeTrackingService(ICommitRepository commitRepository, IMemoryCa
 
     public IReadOnlyCollection<ProjectChange> GetChanges(string repositoryPath)
     {
-        if (_memoryCache.TryGetValue(repositoryPath, out IReadOnlyCollection<ProjectChange> cachedChanges))
+        if (_memoryCache.TryGetValue(repositoryPath, out IReadOnlyCollection<ProjectChange>? cachedChanges))
         {
             return cachedChanges ?? new List<ProjectChange>().AsReadOnly();
         }
 
         var commits = commitRepository.GetCommits(repositoryPath, NumberOfCommitsToFetch);
 
-        IReadOnlyCollection<ProjectChange> projectChanges = new ReadOnlyCollection<ProjectChange>(commits
+        var projectChanges = new ReadOnlyCollection<ProjectChange>(commits
             .Select(commit => new ProjectChange(commit.CommitDate, commit.Message, commit.ClassChanges.ToList()))
             .ToList());
         
