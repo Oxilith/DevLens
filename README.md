@@ -81,9 +81,10 @@ DevLens follows a clean, domain-driven architecture with the following layers:
 
 We welcome contributions! To get started:
 
-1. Create a new feature branch.
-2. Make your changes.
-3. Open a pull request.
+1. Fork the repository.
+2. Create a new feature branch.
+3. Make your changes.
+4. Open a pull request.
 
 Please ensure your code follows best practices and is well-documented.
 
