@@ -71,10 +71,10 @@ jobs:
         with:
           app-name: 'devlens'
           slot-name: 'Production'
-          package: .,
-          clean: true,
-          restart: true,
-          type: 'Static',
+          package: .
+          clean: true
+          restart: true
+          type: 'Static'
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE }}
       
       # - name: Start Azure App Service
