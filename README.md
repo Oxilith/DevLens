@@ -2,6 +2,12 @@
 
 DevLens is (going to be :D) a powerful, developer-centric tool designed to analyze project health and provide insightful metrics on code quality, dependencies, coupling, and complexity. Its goal is to help developers gain visibility into areas of the codebase that need attention, making it easier to identify problematic parts of a project and take proactive steps to improve quality and maintainability.
 
+## Deployed Application
+
+You can access the live version of the application here:
+
+[![Deployed App](https://img.shields.io/badge/Visit-Live%20App-blue)](https://devlens.azurewebsites.net/)
+
 ## Key Features
 
 ### Git Commit Analysis - In progress
