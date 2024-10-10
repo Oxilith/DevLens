@@ -6,7 +6,7 @@ DevLens is (going to be :D) a powerful, developer-centric tool designed to analy
 
 You can access the live version of the application here:
 
-[![Deployed App](https://img.shields.io/badge/Visit-Live%20App-blue)](https://devlens.azurewebsites.net/)
+[![Deployed App](https://img.shields.io/badge/Visit-Live%20App-blue)](https://devlens.azurewebsites.net/) [![GitHub Release](https://github.com/Oxilith/DevLens/actions/workflows/development_devlens.yml/badge.svg?branch=development)](https://github.com/Oxilith/DevLens/actions/workflows/development_devlens.yml)
 
 ## Key Features
 
