@@ -19,9 +19,16 @@ builder.Services.AddMemoryCache();
 
 #if !DEBUG
 
+builder.Services.AddOpenTelemetry().UseAzureMonitor();
+builder.Services.AddApplicationInsightsTelemetry();
+
+#endif
+
+#if DEBUG
+
+builder.Services.AddApplicationInsightsTelemetry(options => options.ConnectionString = builder.Configuration["ApplicationInsights:ConnectionString"]);
 builder.Services.AddOpenTelemetry().UseAzureMonitor(options =>
     options.ConnectionString = builder.Configuration["ApplicationInsights:ConnectionString"]);
-builder.Services.AddApplicationInsightsTelemetry(options => options.ConnectionString = builder.Configuration["ApplicationInsights:ConnectionString"]);
 
 #endif
 
