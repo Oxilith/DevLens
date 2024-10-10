@@ -26,9 +26,6 @@ jobs:
 
       - name: dotnet publish
         run: dotnet publish -c Release --property:PublishDir=${{env.DOTNET_ROOT}}/myapp
-        
-      - name: dotnet pack
-        run: dotnet pack -c Release --property:PackageOutputPath=${{env.DOTNET_ROOT}}/myapp
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
@@ -48,7 +45,13 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: .net-app
-      
+          
+      - name: Stop Azure App Service
+        run: |
+           az webapp stop --name ${{ secrets.AZURE_WEBAPP_NAME }} \
+                          --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
+                          --subscription ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+                       
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v3
@@ -57,3 +60,9 @@ jobs:
           slot-name: 'Production'
           package: .
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE }}
+      
+      - name: Start Azure App Service
+        run: |
+          az webapp start --name ${{ secrets.AZURE_WEBAPP_NAME }} \
+                          --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
+                          --subscription ${{ secrets.AZURE_SUBSCRIPTION_ID }}
