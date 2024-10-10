@@ -29,7 +29,7 @@ jobs:
         run: dotnet build DevLens/DevLens.csproj --configuration Release
 
       - name: dotnet publish
-        run: dotnet publish -c Release --property:PublishDir=${{env.DOTNET_ROOT}}/publish/myapp
+        run: dotnet publish ~/DevLens/DevLens/DevLens.csproj -c Release --property:PublishDir=${{env.DOTNET_ROOT}}/publish/myapp
              cd ${{ env.DOTNET_ROOT }}/publish
              zip -r myapp.zip myapp/
 
