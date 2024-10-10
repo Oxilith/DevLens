@@ -29,10 +29,13 @@ jobs:
         run: dotnet build DevLens/DevLens.csproj --configuration Release
 
       - name: dotnet publish
-        run: dotnet publish ~/DevLens/DevLens/DevLens.csproj -c Release --property:PublishDir=${{env.DOTNET_ROOT}}/publish/myapp
-             cd ${{ env.DOTNET_ROOT }}/publish
-             zip -r myapp.zip myapp/
-
+        run: dotnet publish DevLens/DevLens.csproj -c Release --property:PublishDir=${{env.DOTNET_ROOT}}/publish/myapp
+     
+      - name: Create ZIP package
+        run: |
+          cd ${{ github.workspace }}/publish
+          zip -r myapp.zip myapp/
+          
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
