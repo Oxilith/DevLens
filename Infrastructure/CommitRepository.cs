@@ -27,12 +27,15 @@ public class CommitRepository : ICommitRepository
     public IReadOnlyCollection<Commit> GetRemoteCommits(Uri? repositoryUri, int numberOfCommits)
     {
         var uri = repositoryUri ?? new Uri("https://github.com/microsoft/VFSForGit.git");
-        var localPath = string.Empty;
+        
+        var tempRoot = Path.GetTempPath();
+        var tempDirectoryPath = Path.Combine(tempRoot, "Repository_" + Guid.NewGuid());
+
         try
         {
-            localPath = Repository.Clone(uri.AbsoluteUri, ".\\temp");
+            Repository.Clone(uri.AbsoluteUri, tempDirectoryPath);
 
-            using var repo = new Repository(".\\temp");
+            using var repo = new Repository(tempDirectoryPath);
             return GetCommits(numberOfCommits, repo);
         }
         catch (Exception e)
@@ -42,7 +45,7 @@ public class CommitRepository : ICommitRepository
         }
         finally
         {
-            Directory.Delete(localPath, true);
+            Directory.Delete(tempDirectoryPath, true);
         }
     }
 
