@@ -1,4 +1,5 @@
 ﻿using System.Collections.ObjectModel;
+using System.Diagnostics;
 using Domain;
 using Domain.Entities;
 using Infrastructure.Interfaces;
@@ -9,11 +10,45 @@ namespace Infrastructure;
 
 public class CommitRepository : ICommitRepository
 {
-    public IReadOnlyCollection<Commit> GetCommits(string repositoryPath, int numberOfCommits)
+    public IReadOnlyCollection<Commit> GetLocalCommits(string repositoryPath, int numberOfCommits)
     {
-        using var repo = new Repository(repositoryPath);
-        var commits = new List<Commit>();
+        try
+        {
+            using var repo = new Repository(repositoryPath);
+            return GetCommits(numberOfCommits, repo);
+        }
+        catch (Exception e)
+        {
+            Debug.WriteLine(e);
+            throw;
+        }
+    }
 
+    public IReadOnlyCollection<Commit> GetRemoteCommits(Uri? repositoryUri, int numberOfCommits)
+    {
+        var uri = repositoryUri ?? new Uri("https://github.com/microsoft/VFSForGit.git");
+        var localPath = string.Empty;
+        try
+        {
+            localPath = Repository.Clone(uri.AbsoluteUri, ".\\temp");
+
+            using var repo = new Repository(".\\temp");
+            return GetCommits(numberOfCommits, repo);
+        }
+        catch (Exception e)
+        {
+            Debug.WriteLine(e);
+            throw;
+        }
+        finally
+        {
+            Directory.Delete(localPath, true);
+        }
+    }
+
+    private static IReadOnlyCollection<Commit> GetCommits(int numberOfCommits, Repository repo)
+    {
+        var commits = new List<Commit>();
         foreach (var commit in repo.Commits.Take(numberOfCommits))
         {
             var classChanges = new List<ClassChange>();

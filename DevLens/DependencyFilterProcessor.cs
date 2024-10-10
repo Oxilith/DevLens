@@ -9,9 +9,6 @@ public class DependencyFilterProcessor(ITelemetryProcessor next) : ITelemetryPro
     public void Process(ITelemetry item)
     {
         // Exclude DependencyTelemetry logs
-        if (!(item is DependencyTelemetry))
-        {
-            next.Process(item);
-        }
+        if (!(item is DependencyTelemetry)) next.Process(item);
     }
 }

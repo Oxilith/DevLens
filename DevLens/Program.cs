@@ -18,7 +18,6 @@ builder.Services.AddRazorComponents()
 builder.Services.AddMemoryCache();
 
 #if !DEBUG
-
 builder.Services.AddOpenTelemetry().UseAzureMonitor();
 builder.Services.AddApplicationInsightsTelemetry();
 
@@ -26,7 +25,8 @@ builder.Services.AddApplicationInsightsTelemetry();
 
 #if DEBUG
 
-builder.Services.AddApplicationInsightsTelemetry(options => options.ConnectionString = builder.Configuration["ApplicationInsights:ConnectionString"]);
+builder.Services.AddApplicationInsightsTelemetry(options =>
+    options.ConnectionString = builder.Configuration["ApplicationInsights:ConnectionString"]);
 builder.Services.AddOpenTelemetry().UseAzureMonitor(options =>
     options.ConnectionString = builder.Configuration["ApplicationInsights:ConnectionString"]);
 
@@ -36,11 +36,21 @@ builder.Services.AddSingleton<ITelemetryProcessorFactory>(_ => new DependencyFil
 builder.Services.AddScoped<ICommitRepository, CommitRepository>();
 builder.Services.AddScoped<IChangeTrackingService, ChangeTrackingService>();
 
+#if DEBUG
+
 var repositoryPath = builder.Configuration.GetValue<string>("RepositorySettings:Path");
 builder.Services.AddCascadingValue("Changes",
     p => p.GetRequiredService<IChangeTrackingService>()
         .GetChanges(repositoryPath ?? throw new InvalidOperationException("Repository path is not set")));
 
+#endif
+
+#if !DEBUG
+builder.Services.AddCascadingValue("Changes",
+    p => p.GetRequiredService<IChangeTrackingService>()
+        .GetChanges());
+
+#endif
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

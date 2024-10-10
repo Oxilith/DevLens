@@ -79,7 +79,8 @@ public class ChangeDataProcessor
             .Average(m => m.ChangeCount);
     }
 
-    private IReadOnlyCollection<ChangeDataModel> ApplyLimit(IReadOnlyCollection<ChangeDataModel> orderedChanges, int limit)
+    private IReadOnlyCollection<ChangeDataModel> ApplyLimit(IReadOnlyCollection<ChangeDataModel> orderedChanges,
+        int limit)
     {
         if (limit == 0 || limit >= orderedChanges.Count) return orderedChanges.ToList();
 
