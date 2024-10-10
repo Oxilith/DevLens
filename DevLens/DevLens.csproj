@@ -16,13 +16,5 @@
         <ProjectReference Include="..\Application\Application.csproj"/>
         <ProjectReference Include="..\Infrastructure\Infrastructure.csproj"/>
     </ItemGroup>
-
-    <ItemGroup>
-      <_ContentIncludedByDefault Remove="root\net8.0\appsettings.Development.json" />
-      <_ContentIncludedByDefault Remove="root\net8.0\appsettings.json" />
-      <_ContentIncludedByDefault Remove="root\net8.0\DevLens.deps.json" />
-      <_ContentIncludedByDefault Remove="root\net8.0\DevLens.runtimeconfig.json" />
-      <_ContentIncludedByDefault Remove="root\net8.0\DevLens.staticwebassets.runtime.json" />
-    </ItemGroup>
-
+    
 </Project>
