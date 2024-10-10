@@ -1,8 +1,11 @@
 using Application;
 using Application.Interfaces;
+using Azure.Monitor.OpenTelemetry.AspNetCore;
+using DevLens;
 using DevLens.Components;
 using Infrastructure;
 using Infrastructure.Interfaces;
+using Microsoft.ApplicationInsights.AspNetCore;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -16,13 +19,30 @@ builder.Services.AddMemoryCache();
 builder.Services.AddScoped<ICommitRepository, CommitRepository>();
 builder.Services.AddScoped<IChangeTrackingService, ChangeTrackingService>();
 
-builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.Configuration.GetValue<string>("EnvBaseAddress") ?? throw new InvalidOperationException("Env base address is not set")) });
+#if !DEBUG
+builder.Services.AddOpenTelemetry().UseAzureMonitor();
+builder.Services.AddApplicationInsightsTelemetry();
 
+builder.Services.AddCascadingValue("Changes",
+    p => p.GetRequiredService<IChangeTrackingService>()
+        .GetChanges());
+#endif
+
+#if DEBUG
+
+builder.Services.AddApplicationInsightsTelemetry(options =>
+    options.ConnectionString = builder.Configuration["ApplicationInsights:ConnectionString"]);
+builder.Services.AddOpenTelemetry().UseAzureMonitor(options =>
+    options.ConnectionString = builder.Configuration["ApplicationInsights:ConnectionString"]);
 
 var repositoryPath = builder.Configuration.GetValue<string>("RepositorySettings:Path");
 builder.Services.AddCascadingValue("Changes",
     p => p.GetRequiredService<IChangeTrackingService>()
         .GetChanges(repositoryPath ?? throw new InvalidOperationException("Repository path is not set")));
+
+#endif
+
+builder.Services.AddSingleton<ITelemetryProcessorFactory>(_ => new DependencyFilterProcessorFactory());
 
 var app = builder.Build();
 
