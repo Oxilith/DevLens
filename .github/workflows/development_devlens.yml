@@ -29,13 +29,15 @@ jobs:
         run: dotnet build --configuration Release
 
       - name: dotnet publish
-        run: dotnet publish -c Release --property:PublishDir=${{env.DOTNET_ROOT}}/myapp
+        run: dotnet publish -c Release --property:PublishDir=${{env.DOTNET_ROOT}}/publish/myapp
+             cd ${{ env.DOTNET_ROOT }}/publish
+             zip -r myapp.zip myapp/
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
           name: .net-app
-          path: ${{env.DOTNET_ROOT}}/myapp
+          path: ${{env.DOTNET_ROOT}}/publish/myapp.zip
 
   deploy:
     runs-on: ubuntu-latest
@@ -59,8 +61,8 @@ jobs:
         with:
           name: .net-app
         
-      # - name: List directory contents
-      #   run: ls -la .
+      - name: List directory contents
+        run: ls -la ./publish
       
       # - name: Stop Azure App Service
       #   run: |
@@ -73,8 +75,8 @@ jobs:
         uses: azure/webapps-deploy@v3.0.1
         with:
           app-name: 'devlens'
-          slot-name: 'Production'
-          package: .
+          enable-logging: true
+          package: './publish/myapp.zip'
           clean: true
           restart: true
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE }}
