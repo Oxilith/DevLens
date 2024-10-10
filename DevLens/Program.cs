@@ -6,7 +6,6 @@ using DevLens.Components;
 using Infrastructure;
 using Infrastructure.Interfaces;
 using Microsoft.ApplicationInsights.AspNetCore;
-using Microsoft.ApplicationInsights.Extensibility;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -17,10 +16,16 @@ builder.Services.AddRazorComponents()
 
 builder.Services.AddMemoryCache();
 
+builder.Services.AddScoped<ICommitRepository, CommitRepository>();
+builder.Services.AddScoped<IChangeTrackingService, ChangeTrackingService>();
+
 #if !DEBUG
 builder.Services.AddOpenTelemetry().UseAzureMonitor();
 builder.Services.AddApplicationInsightsTelemetry();
 
+builder.Services.AddCascadingValue("Changes",
+    p => p.GetRequiredService<IChangeTrackingService>()
+        .GetChanges());
 #endif
 
 #if DEBUG
@@ -30,14 +35,6 @@ builder.Services.AddApplicationInsightsTelemetry(options =>
 builder.Services.AddOpenTelemetry().UseAzureMonitor(options =>
     options.ConnectionString = builder.Configuration["ApplicationInsights:ConnectionString"]);
 
-#endif
-
-builder.Services.AddSingleton<ITelemetryProcessorFactory>(_ => new DependencyFilterProcessorFactory());
-builder.Services.AddScoped<ICommitRepository, CommitRepository>();
-builder.Services.AddScoped<IChangeTrackingService, ChangeTrackingService>();
-
-#if DEBUG
-
 var repositoryPath = builder.Configuration.GetValue<string>("RepositorySettings:Path");
 builder.Services.AddCascadingValue("Changes",
     p => p.GetRequiredService<IChangeTrackingService>()
@@ -45,12 +42,8 @@ builder.Services.AddCascadingValue("Changes",
 
 #endif
 
-#if !DEBUG
-builder.Services.AddCascadingValue("Changes",
-    p => p.GetRequiredService<IChangeTrackingService>()
-        .GetChanges());
+builder.Services.AddSingleton<ITelemetryProcessorFactory>(_ => new DependencyFilterProcessorFactory());
 
-#endif
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
