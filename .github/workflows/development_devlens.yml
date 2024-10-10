@@ -65,7 +65,7 @@ jobs:
           name: .net-app
         
       - name: List directory contents
-        run: ls -la ./publish
+        run: ls -la ${{env.DOTNET_ROOT}}/publish/myapp.zip
       
       # - name: Stop Azure App Service
       #   run: |
@@ -79,7 +79,7 @@ jobs:
         with:
           app-name: 'devlens'
           enable-logging: true
-          package: './publish/myapp.zip'
+          package: ${{env.DOTNET_ROOT}}/publish/myapp.zip
           clean: true
           restart: true
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE }}
