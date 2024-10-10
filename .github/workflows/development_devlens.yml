@@ -71,7 +71,7 @@ jobs:
         with:
           app-name: 'devlens'
           slot-name: 'Production'
-          package: .
+          package: ./.net-app.zip
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE }}
       
       - name: Start Azure App Service
