@@ -58,27 +58,27 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: .net-app
-      
-      - name: List directory contents
-        run: ls -la .
         
-      - name: Stop Azure App Service
-        run: |
-           az webapp stop --name ${{ secrets.AZURE_WEBAPP_NAME }} \
-                          --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
-                          --subscription ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      # - name: Stop Azure App Service
+      #   run: |
+      #      az webapp stop --name ${{ secrets.AZURE_WEBAPP_NAME }} \
+      #                     --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
+      #                     --subscription ${{ secrets.AZURE_SUBSCRIPTION_ID }}
                        
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
-        uses: azure/webapps-deploy@v3
+        uses: azure/webapps-deploy@v3.0.1
         with:
           app-name: 'devlens'
           slot-name: 'Production'
-          package: './.net-app.zip'
+          package: .,
+          clean: true,
+          restart: true,
+          type: 'Static',
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE }}
       
-      - name: Start Azure App Service
-        run: |
-          az webapp start --name ${{ secrets.AZURE_WEBAPP_NAME }} \
-                          --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
-                          --subscription ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      # - name: Start Azure App Service
+      #   run: |
+      #     az webapp start --name ${{ secrets.AZURE_WEBAPP_NAME }} \
+      #                     --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
+      #                     --subscription ${{ secrets.AZURE_SUBSCRIPTION_ID }}
