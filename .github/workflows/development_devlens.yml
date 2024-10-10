@@ -75,7 +75,6 @@ jobs:
         uses: azure/webapps-deploy@v3.0.1
         with:
           app-name: 'devlens'
-          enable-logging: true
           package: './myapp.zip'
           clean: true
           restart: true
