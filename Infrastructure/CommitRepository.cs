@@ -25,7 +25,7 @@ public class CommitRepository : ICommitRepository
 
     public IReadOnlyCollection<Commit> GetRemoteCommits(Uri repositoryUri, int numberOfCommits)
     {
-        var tempRoot = Path.GetTempPath();
+        var tempRoot = AppDomain.CurrentDomain.BaseDirectory;
         var tempDirectoryPath = Path.Combine(tempRoot, "Repository_" + Guid.NewGuid());
 
         try
