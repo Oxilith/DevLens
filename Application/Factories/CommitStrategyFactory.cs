@@ -13,21 +13,15 @@ public static class CommitStrategyFactory
     public static ICommitStrategy CreateStrategy(ILogger<ChangeTrackingService> logger, IConfiguration configuration,
         ICommitRepository commitRepository)
     {
-        //TODO: Clean up logging later. This is just for debugging purposes
-        configuration.LogConfiguration(logger);
+        var repositoryUriString = configuration.TryGetValue("RepositorySettings:RemoteRepositoryUri", String.Empty);
+        var repositoryLocalPath = configuration.TryGetValue("RepositorySettings:LocalPath", String.Empty);
         
-        var repositoryUriString = configuration.TryGetValue<string?>("RepositorySettings:RemoteRepositoryUri", null);
-        logger.LogWarning("Repository URI: {RepositoryUri}", repositoryUriString ?? "Null");
-        
-        var repositoryLocalPath = configuration.TryGetValue<string?>("RepositorySettings:LocalPath", null);
-        logger.LogWarning("Repository local path: {RepositoryLocalPath}", repositoryLocalPath ?? "Null");
-        
-        if (repositoryLocalPath is null && repositoryUriString is null)
+        if (string.IsNullOrEmpty(repositoryLocalPath) && string.IsNullOrEmpty(repositoryUriString))
         {
             throw new ArgumentException("Repository settings not found in configuration");
         }
         
-        return repositoryLocalPath == null
+        return string.IsNullOrEmpty(repositoryLocalPath) 
             ? new RemoteGitStrategy(commitRepository, new Uri(repositoryUriString!))
             : new LocalGitStrategy(commitRepository, repositoryLocalPath);
     }
