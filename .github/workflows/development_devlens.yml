@@ -24,30 +24,26 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '8.x'
-
+        
       - name: Build with dotnet
-        run: dotnet build DevLens/DevLens.csproj --configuration Release
+        run: |
+          dotnet restore
+          dotnet build DevLens/DevLens.csproj --configuration Release
 
       - name: dotnet publish
         run: dotnet publish DevLens/DevLens.csproj -c Release --property:PublishDir=${{env.DOTNET_ROOT}}/myapp
      
-      # - name: Create ZIP package
-      #   run: |
-      #     cd ${{ env.DOTNET_ROOT }}
-      #     zip -r myapp.zip myapp/
-          
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
           name: .net-app
-          # path: ${{env.DOTNET_ROOT}}/myapp.zip
           path: ${{env.DOTNET_ROOT}}/myapp
 
   deploy:
     runs-on: ubuntu-latest
     needs: build
     environment:
-      name: 'test'
+      name: 'Test'
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
     
     steps:
@@ -76,12 +72,18 @@ jobs:
         uses: azure/webapps-deploy@v3.0.1
         with:
           app-name: 'devlens'
-          # package: './myapp.zip'
           package: '.'
           clean: true
           restart: true
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE }}
-      
+          
+      - name: Deafult WebApp Configuration from appsettings.json
+        uses: azure/CLI@v1
+        with:
+          azcliversion: 2.42.0
+          inlineScript: |
+            az webapp config appsettings set --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} --name devlens --settings ASPNETCORE_ENVIRONMENT=Test
+            az webapp config appsettings set --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} --name devlens --settings "@appsettings.Test.json"
       # - name: Start Azure App Service
       #   run: |
       #     az webapp start --name ${{ secrets.AZURE_WEBAPP_NAME }} \

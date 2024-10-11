@@ -4,5 +4,5 @@ namespace Application.Interfaces;
 
 public interface IChangeTrackingService
 {
-    public IReadOnlyCollection<ProjectChange> GetChanges(string? repositoryPath = null);
+    public IReadOnlyCollection<ProjectChange> GetChanges();
 }

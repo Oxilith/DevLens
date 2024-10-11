@@ -1,4 +1,5 @@
 ﻿@using Application
+@using Application.Services
 @using Domain.Entities
 @using Domain.Models
 @inject IJSRuntime JS
@@ -37,13 +38,15 @@ else
     [CascadingParameter(Name = "Changes")] public IReadOnlyCollection<ProjectChange>? Changes { get; set; }
     [Parameter] public required FileType FileType { get; set; }
     [Parameter] public int Limit { get; set; } = 0;
+    [Inject] public required IConfiguration Configuration { get; set; }
+    [Inject] public required ILogger<ChangeDataService> Logger { get; set; }
 
     protected override Task OnInitializedAsync()
     {
         if (Changes != null)
         {
-            var processor = new ChangeDataProcessor(Changes, FileType);
-            Data = processor.GetData(Limit);
+            var dataService = new ChangeDataService(Logger, Configuration, Changes, FileType);
+            Data = dataService.GetData(Limit);
         }
 
         return Task.CompletedTask;
@@ -63,8 +66,8 @@ else
             foreach (var item in Data)
             {
                 var filename = item.FileName;
-                var months = item.MonthlyChanges.Select(x => x.Month.ToString()).ToArray();
-                var counts = item.MonthlyChanges.Select(x => x.ChangeCount).ToArray();
+                var months = item.MonthlyChangesOrdered.Select(x => x.Month.ToString()).ToArray();
+                var counts = item.MonthlyChangesOrdered.Select(x => x.ChangeCount).ToArray();
 
                 var chartData = new
                 {
