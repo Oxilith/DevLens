@@ -1,7 +1,7 @@
-using Application.Extensions;
 using Application.Interfaces;
 using Application.Services;
 using Azure.Monitor.OpenTelemetry.AspNetCore;
+using Common.Extensions;
 using DevLens;
 using DevLens.Components;
 using Infrastructure;
