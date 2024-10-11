@@ -14,9 +14,9 @@ public class ChangeTrackingService(
     int numberOfCommitsToFetch = 1000000)
     : IChangeTrackingService
 {
-    public IReadOnlyCollection<ProjectChange> GetChanges(string? repositoryPath = null)
+    public IReadOnlyCollection<ProjectChange> GetChanges()
     {
-        var strategy = CommitStrategyFactory.CreateStrategy(configuration, commitRepository, repositoryPath);
+        var strategy = CommitStrategyFactory.CreateStrategy(configuration, commitRepository);
 
         if (memoryCache.TryGetValue(strategy.GetRepositoryPath(),
                 out IReadOnlyCollection<ProjectChange>? cachedChanges))

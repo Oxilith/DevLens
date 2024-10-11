@@ -37,12 +37,10 @@ builder.Services.AddApplicationInsightsTelemetry(options => options.ConnectionSt
 builder.Services.AddOpenTelemetry().UseAzureMonitor(options => options.ConnectionString = appInsightsConnectionString);
 
 // In development, we want to use a local git repository
-var repositoryPath = builder.Configuration.TryGetValue<string?>("RepositorySettings:Path", default);
-
 builder.Services.AddCascadingValue("Changes",
     p => p
         .GetRequiredService<IChangeTrackingService>()
-        .GetChanges(repositoryPath ?? throw new InvalidOperationException("Repository path is not set")));
+        .GetChanges());
 
 #endif
 

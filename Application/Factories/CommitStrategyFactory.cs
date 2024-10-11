@@ -1,4 +1,5 @@
-﻿using Application.Interfaces;
+﻿using Application.Extensions;
+using Application.Interfaces;
 using Application.Strategies;
 using Infrastructure.Interfaces;
 using Microsoft.Extensions.Configuration;
@@ -7,13 +8,18 @@ namespace Application.Factories;
 
 public static class CommitStrategyFactory
 {
-    public static ICommitStrategy CreateStrategy(IConfiguration configuration, ICommitRepository commitRepository,
-        string? repositoryPath)
+    public static ICommitStrategy CreateStrategy(IConfiguration configuration, ICommitRepository commitRepository)
     {
-        Uri defaultRepositoryUri =
-            new(configuration["DefaultRepositoryUri"] ?? "https://github.com/microsoft/VFSForGit.git");
-        return repositoryPath == null
-            ? new RemoteGitStrategy(commitRepository, defaultRepositoryUri)
-            : new LocalGitStrategy(commitRepository, repositoryPath);
+        var repositoryUriString = configuration.TryGetValue<string?>("RepositorySettings:RemoteRepositoryUri", null);
+        var repositoryLocalPath = configuration.TryGetValue<string?>("RepositorySettings:LocalPath", null);
+
+        if (repositoryLocalPath is null && repositoryUriString is null)
+        {
+            throw new ArgumentException("Repository settings not found in configuration");
+        }
+        
+        return repositoryLocalPath == null
+            ? new RemoteGitStrategy(commitRepository, new Uri(repositoryUriString!))
+            : new LocalGitStrategy(commitRepository, repositoryLocalPath);
     }
 }
