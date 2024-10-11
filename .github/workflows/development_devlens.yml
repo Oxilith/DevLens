@@ -12,6 +12,11 @@ on:
 permissions:
   id-token: write
   contents: read
+env:
+  AZURE_WEBAPP_NAME:: devlens
+  ASPNETCORE_ENVIRONMENT: Test
+  AZURE_WEBAPP_PACKAGE_PATH: '.'
+  DOTNET_VERSION: '8.x'
   
 jobs:
   build:
@@ -26,21 +31,17 @@ jobs:
           dotnet-version: '8.x'
         
       - name: Build with dotnet
-        run: dotnet build DevLens/DevLens.csproj --configuration Release
+        run: |
+          dotnet restore
+          dotnet build DevLens/DevLens.csproj --configuration Release
 
       - name: dotnet publish
         run: dotnet publish DevLens/DevLens.csproj -c Release --property:PublishDir=${{env.DOTNET_ROOT}}/myapp
      
-      # - name: Create ZIP package
-      #   run: |
-      #     cd ${{ env.DOTNET_ROOT }}
-      #     zip -r myapp.zip myapp/
-          
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
           name: .net-app
-          # path: ${{env.DOTNET_ROOT}}/myapp.zip
           path: ${{env.DOTNET_ROOT}}/myapp
 
   deploy:
@@ -76,9 +77,8 @@ jobs:
         uses: azure/webapps-deploy@v3.0.1
         with:
           app-name: 'devlens'
-          # package: './myapp.zip'
           package: '.'
-          clean: true
+          # clean: true
           restart: true
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE }}
 
