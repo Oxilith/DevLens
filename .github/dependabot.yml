@@ -24,7 +24,7 @@ updates:
       
 registries:
   nuget-org:
-    type: nuget
+    type: nuget-feed
     url: 'https://api.nuget.org/v3/index.json'
       # Authentication for private NuGet feeds (optional)
       # username: ${{secrets.NUGET_USERNAME}}
