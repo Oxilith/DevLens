@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Application.Services;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 
 namespace Application.Extensions;
 
@@ -13,6 +15,22 @@ public static class ConfigurationHelpers
         catch
         {
             return defaultValue;
+        }
+    }
+
+    public static void LogConfiguration(this  IConfiguration configuration, ILogger<ChangeTrackingService> logger)
+    {
+        foreach (var section in configuration.GetChildren())
+        {
+            logger.LogWarning("######################### Configuration section: {SectionKey} #########################",
+                section.Key);
+            
+            foreach (var child in section.GetChildren())
+            {
+                logger.LogWarning("Configuration child: {ChildKey}", child.Key);
+            }
+            
+            logger.LogWarning("################################### End of section ###################################");
         }
     }
 }
