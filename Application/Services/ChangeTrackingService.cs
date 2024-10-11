@@ -4,10 +4,12 @@ using Domain.Entities;
 using Infrastructure.Interfaces;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 
 namespace Application.Services;
 
 public class ChangeTrackingService(
+    ILogger<ChangeTrackingService> logger,
     ICommitRepository commitRepository,
     IMemoryCache memoryCache,
     IConfiguration configuration,
@@ -16,7 +18,7 @@ public class ChangeTrackingService(
 {
     public IReadOnlyCollection<ProjectChange> GetChanges()
     {
-        var strategy = CommitStrategyFactory.CreateStrategy(configuration, commitRepository);
+        var strategy = CommitStrategyFactory.CreateStrategy(logger, configuration, commitRepository);
 
         if (memoryCache.TryGetValue(strategy.GetRepositoryPath(),
                 out IReadOnlyCollection<ProjectChange>? cachedChanges))
