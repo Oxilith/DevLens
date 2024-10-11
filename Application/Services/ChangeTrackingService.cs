@@ -13,7 +13,7 @@ public class ChangeTrackingService(
     ICommitRepository commitRepository,
     IMemoryCache memoryCache,
     IConfiguration configuration,
-    int numberOfCommitsToFetch = 1000000)
+    int numberOfCommitsToFetch = 10000)
     : IChangeTrackingService
 {
     public IReadOnlyCollection<ProjectChange> GetChanges()
