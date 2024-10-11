@@ -1,5 +1,6 @@
-using Application;
+using Application.Extensions;
 using Application.Interfaces;
+using Application.Services;
 using Azure.Monitor.OpenTelemetry.AspNetCore;
 using DevLens;
 using DevLens.Components;
@@ -7,10 +8,8 @@ using Infrastructure;
 using Infrastructure.Interfaces;
 using Microsoft.ApplicationInsights.AspNetCore;
 
-
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
@@ -23,26 +22,33 @@ builder.Services.AddScoped<IChangeTrackingService, ChangeTrackingService>();
 builder.Services.AddOpenTelemetry().UseAzureMonitor();
 builder.Services.AddApplicationInsightsTelemetry();
 
+// In production, we want to use a remote git repository
 builder.Services.AddCascadingValue("Changes",
     p => p.GetRequiredService<IChangeTrackingService>()
         .GetChanges());
 #endif
 
 #if DEBUG
+var appInsightsConnectionString =
+    builder.Configuration.TryGetValue<string?>("ApplicationInsights:ConnectionString", default)
+    ?? throw new InvalidOperationException("Application Insights connection string is not set");
 
-builder.Services.AddApplicationInsightsTelemetry(options =>
-    options.ConnectionString = builder.Configuration["ApplicationInsights:ConnectionString"]);
-builder.Services.AddOpenTelemetry().UseAzureMonitor(options =>
-    options.ConnectionString = builder.Configuration["ApplicationInsights:ConnectionString"]);
+builder.Services.AddApplicationInsightsTelemetry(options => options.ConnectionString = appInsightsConnectionString);
+builder.Services.AddOpenTelemetry().UseAzureMonitor(options => options.ConnectionString = appInsightsConnectionString);
 
-var repositoryPath = builder.Configuration.GetValue<string>("RepositorySettings:Path");
+// In development, we want to use a local git repository
+var repositoryPath = builder.Configuration.TryGetValue<string?>("RepositorySettings:Path", default);
+
 builder.Services.AddCascadingValue("Changes",
-    p => p.GetRequiredService<IChangeTrackingService>()
+    p => p
+        .GetRequiredService<IChangeTrackingService>()
         .GetChanges(repositoryPath ?? throw new InvalidOperationException("Repository path is not set")));
 
 #endif
 
-builder.Services.AddSingleton<ITelemetryProcessorFactory>(_ => new DependencyFilterProcessorFactory());
+builder.Services
+    .AddSingleton<ITelemetryProcessorFactory>(_ => new DependencyFilterProcessorFactory(
+        builder.Configuration.TryGetValue("FeatureToggles:EnableAppInsightsDependencyAnalysis", false)));
 
 var app = builder.Build();
 
