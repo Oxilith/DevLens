@@ -11,8 +11,7 @@ on:
 jobs:
   build:
     runs-on: windows-latest
-    env:
-      ASPNETCORE_ENVIRONMENT: Test
+    
     steps:
       - uses: actions/checkout@v4
 
@@ -22,10 +21,10 @@ jobs:
           dotnet-version: '8.x'
 
       - name: Build with dotnet
-        run: dotnet build --configuration Release
+        run: dotnet build DevLens/DevLens.csproj --configuration Release
 
       - name: dotnet publish
-        run: dotnet publish -c Release -o "${{env.DOTNET_ROOT}}/myapp"
+        run: dotnet publish DevLens/DevLens.csproj -c Release --property:EnvironmentName=Development --property:PublishDir="${{env.DOTNET_ROOT}}/myapp"
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
