@@ -1,7 +1,6 @@
 # Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
 # More GitHub Actions for Azure: https://github.com/Azure/actions
-
-name: Build and deploy DevLens
+name: Build and deploy DevLens Test
 
 on:
   push:
@@ -9,14 +8,10 @@ on:
       - development
   workflow_dispatch:
 
-permissions:
-  id-token: write
-  contents: read
-  
 jobs:
   build:
-    runs-on: ubuntu-latest
-
+    runs-on: windows-latest
+    
     steps:
       - uses: actions/checkout@v4
 
@@ -24,68 +19,46 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '8.x'
-        
+
       - name: Build with dotnet
-        run: |
-          dotnet restore
-          dotnet build DevLens/DevLens.csproj --configuration Release
+        run: dotnet build DevLens/DevLens.csproj --configuration Release
 
       - name: dotnet publish
-        run: dotnet publish DevLens/DevLens.csproj -c Release --property:PublishDir=${{env.DOTNET_ROOT}}/myapp
-     
+        run: dotnet publish DevLens/DevLens.csproj -c Release --property:EnvironmentName=Development --property:PublishDir="${{env.DOTNET_ROOT}}/myapp"
+
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
           name: .net-app
-          path: ${{env.DOTNET_ROOT}}/myapp
+          path: "${{env.DOTNET_ROOT}}/myapp"
 
   deploy:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     needs: build
     environment:
       name: 'Test'
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
-    
+    permissions:
+      id-token: write #This is required for requesting the JWT
+
     steps:
-      - name: Azure Login
-        uses: Azure/login@v2.2.0
-        with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
-          client-id: ${{ secrets.AZURE_CLIENT_ID }}
-          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-          enable-AzPSSession: true
-          
       - name: Download artifact from build job
         uses: actions/download-artifact@v4
         with:
           name: .net-app
-              
-      # - name: Stop Azure App Service
-      #   run: |
-      #      az webapp stop --name ${{ secrets.AZURE_WEBAPP_NAME }} \
-      #                     --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
-      #                     --subscription ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-                       
+      
+      - name: Login to Azure
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_023D1BD4C6A54A9DB5D1FB50359D3780 }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_B094C045946C490C9FD59FD5C383CC9C }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_57A8C611C7FD4D62AA7799BD19F60E53 }}
+
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
-        uses: azure/webapps-deploy@v3.0.1
+        uses: azure/webapps-deploy@v3
         with:
-          app-name: 'devlens'
-          package: '.'
-          clean: true
-          restart: true
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE }}
+          app-name: 'rg-devlens-test'
+          slot-name: 'Production'
+          package: .
           
-      - name: Deafult WebApp Configuration from appsettings.json
-        uses: azure/CLI@v1
-        with:
-          azcliversion: 2.42.0
-          inlineScript: |
-            az webapp config appsettings set --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} --name devlens --settings ASPNETCORE_ENVIRONMENT=Test
-            az webapp config appsettings set --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} --name devlens --settings "@appsettings.Test.json"
-      # - name: Start Azure App Service
-      #   run: |
-      #     az webapp start --name ${{ secrets.AZURE_WEBAPP_NAME }} \
-      #                     --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
-      #                     --subscription ${{ secrets.AZURE_SUBSCRIPTION_ID }}
