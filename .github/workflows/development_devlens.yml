@@ -24,9 +24,6 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '8.x'
-
-      - name: Set ASPNETCORE_ENVIRONMENT to Test
-        run: echo "ASPNETCORE_ENVIRONMENT=Test" >> $GITHUB_ENV
         
       - name: Build with dotnet
         run: dotnet build DevLens/DevLens.csproj --configuration Release
@@ -84,7 +81,7 @@ jobs:
           clean: true
           restart: true
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE }}
-      
+
       # - name: Start Azure App Service
       #   run: |
       #     az webapp start --name ${{ secrets.AZURE_WEBAPP_NAME }} \
