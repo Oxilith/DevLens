@@ -25,7 +25,7 @@ jobs:
         run: dotnet build DevLens/DevLens.csproj --configuration Release
 
       - name: dotnet publish
-        run: dotnet publish DevLens/DevLens.csproj -c Release --property:EnvironmentName=Development --property:PublishDir="${{env.DOTNET_ROOT}}/myapp"
+        run: dotnet publish DevLens/DevLens.csproj -c Release --property:EnvironmentName=Production --property:PublishDir="${{env.DOTNET_ROOT}}/myapp"
      
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
