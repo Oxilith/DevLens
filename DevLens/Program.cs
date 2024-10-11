@@ -18,31 +18,33 @@ builder.Services.AddMemoryCache();
 builder.Services.AddScoped<ICommitRepository, CommitRepository>();
 builder.Services.AddScoped<IChangeTrackingService, ChangeTrackingService>();
 
-#if !DEBUG
-builder.Services.AddOpenTelemetry().UseAzureMonitor();
-builder.Services.AddApplicationInsightsTelemetry();
+if (builder.Environment.IsDevelopment())
+{
+    var appInsightsConnectionString =
+        builder.Configuration.TryGetValue<string?>("ApplicationInsights:ConnectionString", default)
+        ?? throw new InvalidOperationException("Application Insights connection string is not set");
 
-// In production, we want to use a remote git repository
-builder.Services.AddCascadingValue("Changes",
-    p => p.GetRequiredService<IChangeTrackingService>()
-        .GetChanges());
-#endif
+    builder.Services.AddApplicationInsightsTelemetry(options => options.ConnectionString = appInsightsConnectionString);
+    builder.Services.AddOpenTelemetry()
+        .UseAzureMonitor(options => options.ConnectionString = appInsightsConnectionString);
 
-#if DEBUG
-var appInsightsConnectionString =
-    builder.Configuration.TryGetValue<string?>("ApplicationInsights:ConnectionString", default)
-    ?? throw new InvalidOperationException("Application Insights connection string is not set");
+    // In development, we want to use a local git repository
+    builder.Services.AddCascadingValue("Changes",
+        p => p
+            .GetRequiredService<IChangeTrackingService>()
+            .GetChanges());
 
-builder.Services.AddApplicationInsightsTelemetry(options => options.ConnectionString = appInsightsConnectionString);
-builder.Services.AddOpenTelemetry().UseAzureMonitor(options => options.ConnectionString = appInsightsConnectionString);
+}
+else
+{
+    builder.Services.AddOpenTelemetry().UseAzureMonitor();
+    builder.Services.AddApplicationInsightsTelemetry();
 
-// In development, we want to use a local git repository
-builder.Services.AddCascadingValue("Changes",
-    p => p
-        .GetRequiredService<IChangeTrackingService>()
-        .GetChanges());
-
-#endif
+    // In production, we want to use a remote git repository
+    builder.Services.AddCascadingValue("Changes",
+        p => p.GetRequiredService<IChangeTrackingService>()
+            .GetChanges());
+}
 
 builder.Services
     .AddSingleton<ITelemetryProcessorFactory>(_ => new DependencyFilterProcessorFactory(
