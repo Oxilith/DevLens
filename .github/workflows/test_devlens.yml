@@ -13,8 +13,6 @@ jobs:
     runs-on: windows-latest
     env:
       ASPNETCORE_ENVIRONMENT: "Test"
-      ASPNET_ENVIRONMENT: "Test"
-      DOTNET_ENVIRONMENT: "Test"
     steps:
       - uses: actions/checkout@v4
 
