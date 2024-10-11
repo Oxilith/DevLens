@@ -83,7 +83,7 @@ jobs:
           azcliversion: 2.42.0
           inlineScript: |
             az webapp config appsettings set --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} --name devlens --settings ASPNETCORE_ENVIRONMENT=Test
-
+            az webapp config appsettings set --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} --name devlens --settings "@appsettings.Test.json"
       # - name: Start Azure App Service
       #   run: |
       #     az webapp start --name ${{ secrets.AZURE_WEBAPP_NAME }} \
