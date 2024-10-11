@@ -13,12 +13,6 @@ permissions:
   id-token: write
   contents: read
   
-env:
-  AZURE_WEBAPP_NAME:: devlens
-  ASPNETCORE_ENVIRONMENT: Test
-  AZURE_WEBAPP_PACKAGE_PATH: '.'
-  DOTNET_VERSION: '8.x'
-  
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -79,9 +73,16 @@ jobs:
         with:
           app-name: 'devlens'
           package: '.'
-          # clean: true
+          clean: true
           restart: true
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE }}
+          
+      - name: Deafult WebApp Configuration from appsettings.json
+        uses: azure/CLI@v1
+        with:
+          azcliversion: 2.42.0
+          inlineScript: |
+            az webapp config appsettings set --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} --name devlens --settings ASPNETCORE_ENVIRONMENT=Test
 
       # - name: Start Azure App Service
       #   run: |
