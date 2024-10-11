@@ -1,6 +1,6 @@
 ﻿using Domain.Enums;
 
-namespace Domain.Extensions;
+namespace Common.Extensions;
 
 public static class FileTypeExtensions
 {

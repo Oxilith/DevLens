@@ -1,8 +1,7 @@
-﻿using Application.Services;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
-namespace Application.Extensions;
+namespace Common.Extensions;
 
 public static class ConfigurationHelpers
 {
@@ -18,7 +17,7 @@ public static class ConfigurationHelpers
         }
     }
 
-    public static void LogConfiguration(this  IConfiguration configuration, ILogger<ChangeTrackingService> logger)
+    public static void LogConfiguration(this  IConfiguration configuration, ILogger<dynamic> logger)
     {
         foreach (var section in configuration.GetChildren())
         {

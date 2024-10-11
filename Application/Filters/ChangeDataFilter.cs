@@ -1,7 +1,7 @@
 ﻿using Application.Services;
+using Common.Extensions;
 using Domain.Entities;
 using Domain.Enums;
-using Domain.Extensions;
 using Microsoft.Extensions.Logging;
 
 namespace Application.Filters;
