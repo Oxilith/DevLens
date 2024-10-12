@@ -23,9 +23,9 @@
     </ItemGroup>
     
     <ItemGroup>
-        <None Update="README.md">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-            <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+        <None Include="README.md">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+            <CopyToPublishDirectory>Always</CopyToPublishDirectory>
         </None>
     </ItemGroup>
 
