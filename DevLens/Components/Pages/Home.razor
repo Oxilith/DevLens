@@ -1,72 +1,65 @@
 ﻿@page "/"
+@using System.IO
+@using Common.MarkdownUtils
+@using Markdig;
+@using DevLens.Components.Markdown
+@inject IWebHostEnvironment Environment
 
 <PageTitle>DevLens</PageTitle>
 
-<div class="jumbotron bg-primary text-white p-5 mb-4 rounded-3" style="background: linear-gradient(to right, #0a1f44, #005f99); color: white;">
-    <div class="container-fluid py-5">
-        <h1 class="display-4">Welcome to DevLens</h1>
-        <p class="lead">DevLens is (going to be :D) a powerful, developer-centric tool designed to analyze project health and provide insightful metrics on code quality, dependencies, coupling, and complexity. Its goal is to help developers gain visibility into areas of the codebase that need attention, making it easier to identify problematic parts of a project and take proactive steps to improve quality and maintainability.</p>
-    </div>
-</div>
+@if (WelcomeSection != null)
+{
+    <WelcomeSection Section="WelcomeSection"/>
 
-<div class="container">
-    <h2 class="mb-4">Key Features</h2>
-    <div class="row">
-        <div class="col-md-6 mb-4">
-            <div class="card h-100 shadow-lg">
-                <div class="card-body">
-                    <h5 class="card-title">Git Commit Analysis - Initial version</h5>
-                    <p class="card-text">DevLens provides insights based on Git commits to help track changes over time, enabling developers to understand the evolution of the codebase.</p>
-                    <ul>
-                        <li><strong>Commit Frequency:</strong> Identify active areas of the project and understand historical activity.</li>
-                        <li><strong>Class Changes:</strong> Track which classes are frequently modified, allowing for early detection of areas prone to bugs.</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-6 mb-4">
-            <div class="card h-100 shadow-lg">
-                <div class="card-body">
-                    <h5 class="card-title">Dependency Analysis - TODO</h5>
-                    <p class="card-text">DevLens identifies dependencies within your project to reveal:</p>
-                    <ul>
-                        <li><strong>Tight Coupling:</strong> Discover areas where classes or modules are tightly coupled, making future changes risky.</li>
-                        <li><strong>External Dependencies:</strong> Monitor and track third-party dependencies that could introduce issues such as security vulnerabilities or maintenance concerns.</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-6 mb-4">
-            <div class="card h-100 shadow-lg">
-                <div class="card-body">
-                    <h5 class="card-title">Coupling and Complexity Assessment - TODO</h5>
-                    <p class="card-text">Analyze the complexity of your code to identify areas that might need refactoring.</p>
-                    <ul>
-                        <li><strong>Code Complexity:</strong> Cyclomatic complexity metrics are used to highlight the most complex methods or classes.</li>
-                        <li><strong>Coupling Metrics:</strong> Show dependencies and coupling between components, allowing developers to focus on decoupling for a more maintainable architecture.</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-6 mb-4">
-            <div class="card h-100 shadow-lg">
-                <div class="card-body">
-                    <h5 class="card-title">Hotspot Detection - TODO</h5>
-                    <p class="card-text">DevLens highlights "hotspots"—areas that have high complexity and frequent changes. This helps teams focus on stabilizing critical parts of the code and ensuring these areas receive extra attention during reviews.</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-12 mb-4">
-            <div class="card h-100 shadow-lg">
-                <div class="card-body">
-                    <h5 class="card-title">Developer Insights Dashboard - TODO</h5>
-                    <p class="card-text">DevLens provides an interactive dashboard that consolidates all these insights into one place:</p>
-                    <ul>
-                        <li><strong>Visualize Complexity:</strong> Charts and graphs make it easy to understand the health of different parts of the project.</li>
-                        <li><strong>Actionable Recommendations:</strong> Suggests refactoring opportunities and highlights risky code areas to prioritize.</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+    <MarkdownSectionChildCards Section="KeyFeaturesSections" Style="@CardStyle"/>
+    <hr/>
+    <MarkdownFullWidthSectionCard Section="ArchitectureSection" Style="@CardStyle"/>
+    <hr/>
+    <MarkdownFullWidthSectionCard Section="ContactSection" Style="@CardStyle"/>
+}
+else
+{
+    <div class="alert alert-warning" role="alert">README.md file not found or could not be read.</div>
+}
+
+@code {
+    [Inject] ILogger<Home>? Logger { get; set; }
+    private const string CardStyle = "background: linear-gradient(to bottom, #081b38, #003f66); color: white;";
+
+    protected override void OnInitialized()
+    {
+        var readmePaths = new[]
+        {
+            Path.Combine(Environment.ContentRootPath, "README.md"),
+            Path.Combine(Environment.ContentRootPath, "..", "README.md")
+        };
+
+        foreach (var path in readmePaths)
+        {
+            Logger?.LogInformation($"Looking for README.md at: {path}");
+
+            if (!File.Exists(path)) continue;
+            Logger?.LogInformation($"Reading README.md from: {path}");
+
+            var markdown = File.ReadAllText(path);
+            var parser = new MarkdownParser();
+            var sections = parser.ParseMarkdown(markdown, new MarkdownPipelineBuilder().Build());
+
+            WelcomeSection = sections.ChildSections.FirstOrDefault(x => x.Title.Contains("Welcome"));
+            KeyFeaturesSections = WelcomeSection?.ChildSections.FirstOrDefault(x => x.Title.Contains("Key Features"));
+            ArchitectureSection = WelcomeSection?.ChildSections.FirstOrDefault(x => x.Title.Contains("Architecture"));
+            ContactSection = WelcomeSection?.ChildSections.FirstOrDefault(x => x.Title.Contains("Contact"));
+        }
+
+        base.OnInitialized();
+    }
+
+    public MarkdownSection? ContactSection { get; set; }
+
+    public MarkdownSection? ArchitectureSection { get; set; }
+
+    public MarkdownSection? KeyFeaturesSections { get; set; }
+
+    public MarkdownSection? WelcomeSection { get; set; }
+
+}

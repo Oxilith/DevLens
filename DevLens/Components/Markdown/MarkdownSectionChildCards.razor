@@ -1,0 +1,19 @@
+﻿@using Common.MarkdownUtils
+
+@code {
+    [Parameter] public MarkdownSection? Section { get; set; }
+    [Parameter] public string? Style { get; set; }
+}
+
+@if (Section != null)
+{
+    <div class="container">
+        <h2 class="mb-4">@Section.Title</h2>
+        <div class="row">
+            @foreach (var featureSection in Section.ChildSections)
+            {
+                <MarkdownSectionCard Section="featureSection" Style="@Style"/>
+            }
+        </div>
+    </div>
+}
