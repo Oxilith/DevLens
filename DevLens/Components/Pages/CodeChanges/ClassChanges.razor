@@ -1,9 +1,48 @@
 ﻿@page "/class"
-@rendermode InteractiveServer
+@using System.Collections.ObjectModel
+@using Application.Interfaces
+
+@inject IChangeTrackingService ChangeDataService
 
 <PageTitle>Class changes</PageTitle>
 
-<h3>Class changes</h3>
-<hr/><br/>
+@if (ShowErrorMessage)
+{
+    <div class="alert alert-danger" role="alert">Error loading content. Request timed out.</div>
+}
 
-<RepositoryChangesPlots FileType="FileType.Class" Limit="10"/>
+else if (!isLoaded)
+{
+    <div class="loading-spinner">
+        <div class="loader"></div>
+    </div>
+}
+else
+{
+    <h3>Class changes</h3>
+    <hr/>
+    <br/>
+    <RepositoryChangesPlots Changes="@loadedData" FileType="FileType.Class" Limit="10"/>
+}
+@code {
+    private bool ShowErrorMessage = false;
+    private bool isLoaded = false;
+    private IReadOnlyCollection<ProjectChange> loadedData = null;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var token = new CancellationTokenSource(TimeSpan.FromMinutes(2));
+            loadedData = await ChangeDataService.GetChangesAsync(token.Token);
+        }
+        catch (Exception)
+        {
+            ShowErrorMessage = true;
+        }
+        finally
+        {
+            isLoaded = true;
+        }
+    }
+}

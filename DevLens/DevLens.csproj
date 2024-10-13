@@ -19,14 +19,12 @@
 
     <ItemGroup>
       <PackageReference Include="Markdig" Version="0.37.0" />
+      <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="8.0.10" />
+      <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="8.0.10" />
       <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="8.0.1" />
     </ItemGroup>
     
-    <ItemGroup>
-        <None Include="$(SolutionDir)\README.md">
-            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-            <CopyToPublishDirectory>Always</CopyToPublishDirectory>
-        </None>
-    </ItemGroup>
-
+    <Target Name="PostPublish" AfterTargets="Publish">
+        <Copy SourceFiles="$(SolutionDir)\README.md" DestinationFolder="$(PublishDir)" />
+    </Target>
 </Project>

@@ -27,25 +27,16 @@ if (builder.Environment.IsDevelopment())
     builder.Services.AddApplicationInsightsTelemetry(options => options.ConnectionString = appInsightsConnectionString);
     builder.Services.AddOpenTelemetry()
         .UseAzureMonitor(options => options.ConnectionString = appInsightsConnectionString);
-
-    // In development, we want to use a local git repository
-    builder.Services.AddCascadingValue("Changes",
-        p => p
-            .GetRequiredService<IChangeTrackingService>()
-            .GetChanges());
-
 }
 else
 {
     builder.Services.AddOpenTelemetry().UseAzureMonitor();
     builder.Services.AddApplicationInsightsTelemetry();
-
-    // In production, we want to use a remote git repository
-    builder.Services.AddCascadingValue("Changes",
-        p => p.GetRequiredService<IChangeTrackingService>()
-            .GetChanges());
 }
 
+/*
+builder.Services.AddCascadingValue("Changes",
+    async p => await p.GetRequiredService<IChangeTrackingService>().GetChangesAsync());*/
 builder.Services
     .AddSingleton<ITelemetryProcessorFactory>(_ => new DependencyFilterProcessorFactory(
         builder.Configuration.TryGetValue("FeatureToggles:EnableAppInsightsDependencyAnalysis", false)));

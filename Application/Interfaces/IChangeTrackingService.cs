@@ -1,8 +1,9 @@
-﻿using Domain.Entities;
+﻿using System.Collections.ObjectModel;
+using Domain.Entities;
 
 namespace Application.Interfaces;
 
 public interface IChangeTrackingService
 {
-    public IReadOnlyCollection<ProjectChange> GetChanges();
+    public Task<ReadOnlyCollection<ProjectChange>> GetChangesAsync(CancellationToken cancellationToken);
 }

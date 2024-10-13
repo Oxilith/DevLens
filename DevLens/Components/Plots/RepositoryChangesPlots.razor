@@ -1,16 +1,9 @@
-﻿@using Application
-@using Application.Services
-@using Domain.Entities
-@using Domain.Models
-@inject IJSRuntime JS
+﻿@inject IJSRuntime JS
+@attribute [CascadingTypeParameter(nameof(Changes))]
 
 @rendermode InteractiveServer
-@if (_isLoading)
-{
-    <div class="loading-spinner">
-        <div class="loader"></div>
-    </div>
-}else if (!Data!.Any())
+
+@if (!Data?.Any() ?? true)
 {
     <p>Nothing to show...</p>
 }
@@ -38,10 +31,9 @@ else
 
 @code {
     private readonly Random _random = new(DateTimeOffset.UtcNow.Millisecond);
-    private bool _isLoading = true;
     public IReadOnlyCollection<ChangeDataModel>? Data { get; set; }
 
-    [CascadingParameter(Name = "Changes")] public IReadOnlyCollection<ProjectChange>? Changes { get; set; }
+    [Parameter] public IReadOnlyCollection<ProjectChange>? Changes { get; set; }
     [Parameter] public required FileType FileType { get; set; }
     [Parameter] public int Limit { get; set; } = 0;
 
