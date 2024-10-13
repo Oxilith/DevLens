@@ -25,7 +25,7 @@
     </ItemGroup>
     
     <Target Name="PostPublish" AfterTargets="Publish">
-        <Copy SourceFiles="..\..\..\..\README.md" DestinationFolder="$(PublishDir)" />
+        <Copy SourceFiles="..\..\README.md" DestinationFolder="$(PublishDir)" />
     </Target>
     
 </Project>
