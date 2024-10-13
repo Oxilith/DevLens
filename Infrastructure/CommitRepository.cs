@@ -1,5 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using System.Diagnostics;
+using Common.Extensions;
 using Domain.Entities;
 using Infrastructure.Interfaces;
 using LibGit2Sharp;
@@ -25,7 +26,7 @@ public class CommitRepository : ICommitRepository
 
     public IReadOnlyCollection<Commit> GetRemoteCommits(Uri repositoryUri, int numberOfCommits)
     {
-        var tempRoot = Path.GetTempPath();
+        var tempRoot = AppDomain.CurrentDomain.BaseDirectory;
         var tempDirectoryPath = Path.Combine(tempRoot, "Repository_" + Guid.NewGuid());
 
         try
@@ -35,14 +36,10 @@ public class CommitRepository : ICommitRepository
             using var repo = new Repository(tempDirectoryPath);
             return GetCommits(numberOfCommits, repo);
         }
-        catch (Exception e)
-        {
-            Debug.WriteLine(e);
-            throw;
-        }
         finally
         {
-            Directory.Delete(tempDirectoryPath, true);
+            Thread.Sleep(1000);
+            FileHelpers.ForceDeleteDirectory(tempDirectoryPath);
         }
     }
 

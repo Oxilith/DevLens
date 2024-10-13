@@ -26,6 +26,10 @@ jobs:
 
       - name: dotnet publish
         run: dotnet publish DevLens/DevLens.csproj -c Release --property:EnvironmentName="Test" --property:PublishDir="${{env.DOTNET_ROOT}}/myapp"
+        
+      - name: Copy Markdown file to publish directory
+        run: |
+          cp README.md "${{env.DOTNET_ROOT}}/myapp/README.md"
 
       - name: Copy Markdown file to publish directory
         run: |

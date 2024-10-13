@@ -1,0 +1,21 @@
+﻿@using Common.MarkdownUtils
+
+@code {
+    [Parameter] public MarkdownSection? Section { get; set; }
+    [Parameter] public string? Style { get; set; } = "background: linear-gradient(to bottom, #0a1f44, #004f80); color: white";
+    public const string DefaultGreeting = "Welcome to DevLens!";
+}
+
+<div class="jumbotron bg-primary text-white p-5 mb-4 rounded-3" style="@Style">
+    <div class="container-fluid py-5">
+        @if (Section != null)
+        {
+            <h1 class="display-4">@Section.Title</h1>
+            <div>@(Section.MarkupString)</div>
+        }
+        else
+        {
+            <h1 class="display-4">@DefaultGreeting</h1>
+        }
+    </div>
+</div>

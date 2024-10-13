@@ -1,4 +1,5 @@
-﻿using Application.Factories;
+﻿using System.Collections.ObjectModel;
+using Application.Factories;
 using Application.Interfaces;
 using Domain.Entities;
 using Infrastructure.Interfaces;
@@ -13,27 +14,30 @@ public class ChangeTrackingService(
     ICommitRepository commitRepository,
     IMemoryCache memoryCache,
     IConfiguration configuration,
-    int numberOfCommitsToFetch = 1000000)
+    int numberOfCommitsToFetch = 10000)
     : IChangeTrackingService
 {
-    public IReadOnlyCollection<ProjectChange> GetChanges()
+    public async Task<ReadOnlyCollection<ProjectChange>> GetChangesAsync(CancellationToken token)
     {
-        var strategy = CommitStrategyFactory.CreateStrategy(logger, configuration, commitRepository);
+        return await Task.Run(async () =>
+        {
+            var strategy = CommitStrategyFactory.CreateStrategy(logger, configuration, commitRepository);
 
-        if (memoryCache.TryGetValue(strategy.GetRepositoryPath(),
-                out IReadOnlyCollection<ProjectChange>? cachedChanges))
-            return cachedChanges ?? new List<ProjectChange>().AsReadOnly();
+            if (memoryCache.TryGetValue(strategy.GetRepositoryPath(),
+                    out ReadOnlyCollection<ProjectChange>? cachedChanges))
+                return await Task.FromResult(cachedChanges ?? new List<ProjectChange>().AsReadOnly());
 
-        var projectChanges = strategy
-            .GetCommits(numberOfCommitsToFetch)
-            .Select(commit => new ProjectChange(commit.CommitDate, commit.Message, commit.ClassChanges))
-            .ToList()
-            .AsReadOnly();
+            var projectChanges = strategy
+                .GetCommits(numberOfCommitsToFetch)
+                .Select(commit => new ProjectChange(commit.CommitDate, commit.Message, commit.ClassChanges))
+                .ToList()
+                .AsReadOnly();
 
-        memoryCache.Set(strategy.GetRepositoryPath(),
-            projectChanges,
-            new MemoryCacheEntryOptions { Priority = CacheItemPriority.NeverRemove });
+            memoryCache.Set(strategy.GetRepositoryPath(),
+                projectChanges,
+                new MemoryCacheEntryOptions { Priority = CacheItemPriority.NeverRemove });
 
-        return projectChanges;
+            return await Task.FromResult(projectChanges);
+        }, token);
     }
 }

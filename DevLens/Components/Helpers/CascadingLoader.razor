@@ -1,0 +1,23 @@
+﻿@* @typeparam TDependency *@
+
+@if(ShowErrorMessages)
+{
+        <div class="alert alert-danger" role="alert">Error loading content. Request timed out.</div>
+}
+else if (!Loaded)
+{
+    <div class="loading-spinner">
+        <div class="loader"></div>
+    </div>
+}
+else
+{
+    if (ChildContent != null)
+    {
+        @ChildContent
+    }
+    else
+    {
+        <div class="alert alert-warning" role="alert">No content provided to Loader.</div>
+    }
+}
