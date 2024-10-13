@@ -38,10 +38,6 @@ public class CommitRepository : ICommitRepository
         }
         finally
         {
-            Directory.GetDirectories(tempDirectoryPath, "Repository_*", SearchOption.AllDirectories)
-                .ToList()
-                .ForEach(FileHelpers.ForceDeleteDirectory);
-            
             FileHelpers.ForceDeleteDirectory(tempDirectoryPath);
         }
     }
