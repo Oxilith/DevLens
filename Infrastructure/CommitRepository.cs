@@ -38,6 +38,7 @@ public class CommitRepository : ICommitRepository
         }
         finally
         {
+            Thread.Sleep(1000);
             FileHelpers.ForceDeleteDirectory(tempDirectoryPath);
         }
     }
