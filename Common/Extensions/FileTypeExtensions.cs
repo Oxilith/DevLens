@@ -10,8 +10,10 @@ public static class FileTypeExtensions
         {
             FileType.Json => ".json",
             FileType.Class => ".cs",
+            FileType.Razor => ".razor",
             FileType.Ts => ".ts",
             FileType.Tsx => ".tsx",
+            FileType.Js => ".js",
             _ => throw new ArgumentOutOfRangeException(nameof(fileType), fileType, null)
         };
     }

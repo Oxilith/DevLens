@@ -5,5 +5,7 @@ public enum FileType
     Json,
     Class,
     Ts,
-    Tsx
+    Tsx,
+    Js,
+    Razor
 }

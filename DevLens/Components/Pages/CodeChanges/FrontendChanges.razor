@@ -1,13 +1,68 @@
 ﻿@page "/front"
+@using Application.Interfaces
+
+@inject IChangeTrackingService ChangeDataService
 
 <PageTitle>Frontend changes</PageTitle>
 
-<h3>Frontend .tsx changes</h3>
-<hr/><br/>
-<RepositoryChangesPlots FileType="FileType.Tsx" Limit="5"/>
 
-<br/>
+@if (ShowErrorMessage)
+{
+    <div class="alert alert-danger" role="alert">Error loading content. Request timed out.</div>
+}
 
-<h3>Frontend .ts changes</h3>
-<hr/><br/>
-<RepositoryChangesPlots FileType="FileType.Ts" Limit="5"/>
+else if (!isLoaded)
+{
+    <div class="loading-spinner">
+        <div class="loader"></div>
+    </div>
+}
+else
+{
+    <h3>Frontend .tsx changes</h3>
+    <hr/><br/>
+    <RepositoryChangesPlots Changes="@loadedData" FileType="FileType.Tsx" Limit="5"/>
+
+    <br/>
+
+    <h3>Frontend .ts changes</h3>
+    <hr/><br/>
+    <RepositoryChangesPlots Changes="@loadedData" FileType="FileType.Ts" Limit="5"/>    
+
+
+    <br/>
+
+    <h3>Frontend .js changes</h3>
+    <hr/><br/>
+    <RepositoryChangesPlots Changes="@loadedData" FileType="FileType.Js" Limit="5"/>
+
+    <br/>
+
+    <h3>Frontend .razor changes</h3>
+    <hr/><br/>
+    <RepositoryChangesPlots Changes="@loadedData" FileType="FileType.Razor" Limit="5"/>
+
+
+}
+@code {
+    private bool ShowErrorMessage = false;
+    private bool isLoaded = false;
+    private IReadOnlyCollection<ProjectChange> loadedData = null;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var token = new CancellationTokenSource(TimeSpan.FromMinutes(2));
+            loadedData = await ChangeDataService.GetChangesAsync(token.Token);
+        }
+        catch (Exception)
+        {
+            ShowErrorMessage = true;
+        }
+        finally
+        {
+            isLoaded = true;
+        }
+    }
+}
