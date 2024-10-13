@@ -29,7 +29,7 @@ jobs:
         
       - name: Copy Markdown file to publish directory
         run: |
-          cp DevLens/README.md "${{env.DOTNET_ROOT}}/myapp/README.md"
+          cp README.md "${{env.DOTNET_ROOT}}/myapp/README.md"
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
