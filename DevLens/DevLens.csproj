@@ -24,8 +24,4 @@
       <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="8.0.1" />
     </ItemGroup>
     
-    <Target Name="PostPublish" AfterTargets="Publish">
-        <Copy SourceFiles="..\..\..\README.md" DestinationFolder="$(PublishDir)" />
-    </Target>
-    
 </Project>
