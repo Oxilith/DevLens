@@ -31,6 +31,10 @@ jobs:
         run: |
           cp README.md "${{env.DOTNET_ROOT}}/myapp/README.md"
 
+      - name: Copy Markdown file to publish directory
+        run: |
+          cp README.md "${{env.DOTNET_ROOT}}/myapp/README.md"
+
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
