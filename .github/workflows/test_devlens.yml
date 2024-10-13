@@ -27,10 +27,9 @@ jobs:
       - name: dotnet publish
         run: dotnet publish DevLens/DevLens.csproj -c Release --property:EnvironmentName="Test" --property:PublishDir="${{env.DOTNET_ROOT}}/myapp"
 
-      # Copy the markdown file from solution directory to the publish directory
       - name: Copy Markdown file to publish directory
         run: |
-          cp DevLens/README.md ${{env.DOTNET_ROOT}}/myapp/README.md
+          cp DevLens/README.md "${{env.DOTNET_ROOT}}/myapp/README.md"
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
