@@ -6,23 +6,30 @@
 
 @rendermode InteractiveServer
 
-@if (Data is null)
-{
-    <p>Loading changes...</p>
+@if (_isLoading)
+{    <div class="loading-spinner">
+        <div class="loader"></div>
+    </div>
 }
-else if (!Data.Any())
+else if (!Data!.Any())
 {
-    <p>Nothing to show.</p>
+    <p>Nothing to show...</p>
 }
 else
 {
     <div class="row">
-        @foreach (var item in Data)
+        @foreach (var item in Data!)
         {
             <div class="col-md-6 mb-4">
                 <div class="chart-container" style="position: relative; height:200px!important; width: 600px!important;">
-                    <h6>@item.FileName</h6>
-                    <canvas id="chart_@item.FileName.Replace(".", "_")"></canvas>
+                    <div class="card h-100 shadow-lg">
+                        <div class="card-header">
+                            @item.FileName
+                        </div>
+                        <div class="card-body">
+                            <canvas id="chart_@item.FileName.Replace(".", "_")"></canvas>
+                        </div>
+                    </div>
                 </div>
                 <br/><hr/><br/>
             </div>
@@ -32,15 +39,22 @@ else
 
 @code {
     private readonly Random _random = new(DateTimeOffset.UtcNow.Millisecond);
-
+    private bool _isLoading = true;
     public IReadOnlyCollection<ChangeDataModel>? Data { get; set; }
 
     [CascadingParameter(Name = "Changes")] public IReadOnlyCollection<ProjectChange>? Changes { get; set; }
     [Parameter] public required FileType FileType { get; set; }
     [Parameter] public int Limit { get; set; } = 0;
+    
     [Inject] public required IConfiguration Configuration { get; set; }
     [Inject] public required ILogger<ChangeDataService> Logger { get; set; }
 
+    
+    protected override void OnParametersSet()
+    {
+        _isLoading = Data == null;
+    }
+    
     protected override Task OnInitializedAsync()
     {
         if (Changes != null)

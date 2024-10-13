@@ -1,5 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using System.Diagnostics;
+using Common.Extensions;
 using Domain.Entities;
 using Infrastructure.Interfaces;
 using LibGit2Sharp;
@@ -35,14 +36,13 @@ public class CommitRepository : ICommitRepository
             using var repo = new Repository(tempDirectoryPath);
             return GetCommits(numberOfCommits, repo);
         }
-        catch (Exception e)
-        {
-            Debug.WriteLine(e);
-            throw;
-        }
         finally
         {
-            Directory.Delete(tempDirectoryPath, true);
+            Directory.GetDirectories(tempDirectoryPath, "Repository_*", SearchOption.AllDirectories)
+                .ToList()
+                .ForEach(FileHelpers.ForceDeleteDirectory);
+            
+            FileHelpers.ForceDeleteDirectory(tempDirectoryPath);
         }
     }
 
